@@ -1110,7 +1110,10 @@ cleanup:
 /*********************************************************************//**
 Retrieves MySQL binlog position of the master server in a replication
 setup and saves it in a file. It also saves it in mysql_slave_position
-variable. */
+variable. 
+
+// For Netease RDS, retrieves MySQL binlog position anyway.
+*/
 bool
 write_slave_info(MYSQL *connection)
 {
@@ -1182,10 +1185,12 @@ write_slave_info(MYSQL *connection)
 		result = backup_file_printf(XTRABACKUP_SLAVE_INFO,
 			"CHANGE MASTER TO MASTER_LOG_FILE='%s', "
 			"MASTER_LOG_POS=%s\n", filename, position);
-		ut_a(asprintf(&mysql_slave_position,
-			"master host '%s', filename '%s', position '%s'",
-			master, filename, position) != -1);
 	}
+
+    // For Netease RDS, print binlog position anyway
+    ut_a(asprintf(&mysql_slave_position,
+                "master host '%s', filename '%s', position '%s'",
+                master, filename, position) != -1);
 
 cleanup:
 	free_mysql_variables(status);
